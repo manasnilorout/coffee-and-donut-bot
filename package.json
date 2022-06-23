@@ -1,0 +1,32 @@
+{
+  "name": "coffee-and-donut-bot",
+  "version": "1.0.0",
+  "description": "Cofee And Donut",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manasnilorout/coffee-and-donut-bot.git"
+  },
+  "keywords": [
+    "Slack",
+    "Cofee",
+    "And",
+    "Donut",
+    "slack",
+    "bot"
+  ],
+  "author": "Manas Ranjan Nilorout",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manasnilorout/coffee-and-donut-bot/issues"
+  },
+  "homepage": "https://github.com/manasnilorout/coffee-and-donut-bot#readme",
+  "dependencies": {
+    "@slack/events-api": "^3.0.1",
+    "@slack/web-api": "^6.7.2",
+    "express": "^4.18.1"
+  }
+}
