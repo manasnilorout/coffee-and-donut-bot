@@ -2,6 +2,7 @@
 
 const express = require('express');
 const app = express();
+const port = process.env.PORT || 5000;
 
 app.get('/', function (req, res) {
     res.json({
@@ -15,4 +16,4 @@ app.post('/slack-events', function (req, res) {
     res.json({success: true});
 });
 
-app.listen(3000, () => console.log('App started on port: 3000'));
+app.listen(port, () => console.log(`App started on port: ${port}`));
