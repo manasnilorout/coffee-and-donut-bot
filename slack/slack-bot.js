@@ -5,15 +5,20 @@ const { WebClient } = require('@slack/web-api');
 const {
     addUsersToGoogleSheet,
     addUserPreferenceToSheet,
-    addUserInterestsToSheet
+    addUserInterestsToSheet,
+    getARandomQuestion,
+    getARandomGame,
 } = require('../integration-service/goggle-sheet-interpreter');
 const {
     OPT_IN_OUT_PREFERENCE,
     SLACK_NATIVE,
     CONNECTION_PREFERENCE,
-    INTERESTS_PREFERENCE
+    INTERESTS_PREFERENCE,
+    SLACK_COMMANDS,
 } = require('./slack-event-types');
 const interactiveMessageAckBlock = require('./message-templates/interactiveMessageAckBlock');
+const buildQuestion = require('./message-templates/questionBlock');
+const buildGameBlock = require('./message-templates/gameSuggestionBlock');
 const nodeCache = require('../helpers/nodeCache');
 
 const web = new WebClient(process.env.BOT_TOKEN);
@@ -25,9 +30,10 @@ const updateAMessage = (ts, text, blocks, channel) => web.chat.update({ ts, text
 const checkForMessageInCache = (messageTs) => nodeCache.get(messageTs);
 
 const ackMessage = async (ts, channel, blocks, text, overrideText) => {
-    blocks.pop();
-    blocks.push(interactiveMessageAckBlock(overrideText));
-    await updateAMessage(ts, text, blocks, channel);
+    const newBlocks = JSON.parse(JSON.stringify(blocks));
+    newBlocks.pop();
+    newBlocks.push(interactiveMessageAckBlock(overrideText));
+    await updateAMessage(ts, text, newBlocks, channel);
 }
 
 const handleMessageEvent = async (eventType, user, action, ts, channel) => {
@@ -107,9 +113,35 @@ const askForOptingInPreference = async (userId) => {
     }
 };
 
+const handleSlackCommand = async (command, payload) => {
+    const { user_id, channel_id } = payload;
+    switch (command) {
+        case SLACK_COMMANDS.COFFEE: {
+            await askForOptingInPreference(user_id);
+            break;
+        }
+        case SLACK_COMMANDS.ASK_A_QUESTIONS: {
+            const question = await getARandomQuestion(payload.text);
+            const { text, blocks } = buildQuestion(question);
+            await postAMessage(text, blocks, channel_id);
+            break;
+        }
+        case SLACK_COMMANDS.SUGGEST_GAME: {
+            const games = await getARandomGame();
+            const { text, blocks } = buildGameBlock(games);
+            await postAMessage(text, blocks, channel_id);
+            break;
+        }
+        default: {
+            console.log('Unhandled command received', payload);
+            break;
+        }
+    }
+};
+
 const handleSlackEvent = async (eventType, payload) => {
     try {
-        const { container, actions } = payload;
+        const { container, actions, command } = payload;
         switch (eventType) {
             case SLACK_NATIVE.BLOCK_ACTIONS:
                 const { message_ts, channel_id } = container;
@@ -118,8 +150,13 @@ const handleSlackEvent = async (eventType, payload) => {
                     await handleMessageEvent(messageDetails.type, messageDetails.userId, actions[0], message_ts, channel_id);
                 }
                 break;
+            case SLACK_NATIVE.COMMAND: {
+                await handleSlackCommand(command, payload);
+                break;
+            }
             default:
                 console.log('Unhandled event received', eventType);
+                break;
         }
     } catch (err) {
         console.error('Oops something went wrong!!', err);

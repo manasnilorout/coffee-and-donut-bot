@@ -23,6 +23,8 @@ app.post('/slack-events', async (req, res) => {
     if (req.body && req.body.payload) {
         const payload = JSON.parse(req.body.payload);
         handleSlackEvent(payload.type, payload);
+    } else if (req.body && req.body.command){
+        handleSlackEvent('command', req.body);
     }
     res.json({ success: true });
 });
