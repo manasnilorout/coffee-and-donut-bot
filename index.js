@@ -19,7 +19,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/slack-events', async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     if (req.body && req.body.payload) {
         const payload = JSON.parse(req.body.payload);
         handleSlackEvent(payload.type, payload);

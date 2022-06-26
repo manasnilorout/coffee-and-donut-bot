@@ -139,6 +139,10 @@ const handleSlackCommand = async (command, payload) => {
     }
 };
 
+const getEquivalentCommand = async (payload) => {
+    console.log('Doing nothing with the shortcut', payload)
+};
+
 const handleSlackEvent = async (eventType, payload) => {
     try {
         const { container, actions, command } = payload;
@@ -150,6 +154,10 @@ const handleSlackEvent = async (eventType, payload) => {
                     await handleMessageEvent(messageDetails.type, messageDetails.userId, actions[0], message_ts, channel_id);
                 }
                 break;
+            case SLACK_NATIVE.SHORTCUT: {
+                await getEquivalentCommand(payload);
+                break;
+            }
             case SLACK_NATIVE.COMMAND: {
                 await handleSlackCommand(command, payload);
                 break;
