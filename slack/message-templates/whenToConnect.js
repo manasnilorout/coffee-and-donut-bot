@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+	text: "Timing preference!",
 	blocks: [
 		{
 			"type": "divider"

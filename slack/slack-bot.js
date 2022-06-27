@@ -15,6 +15,7 @@ const {
     SLACK_NATIVE,
     CONNECTION_PREFERENCE,
     INTERESTS_PREFERENCE,
+    TIMING_FREQUENCY_PREFERENCE,
     SLACK_COMMANDS,
 } = require('./slack-event-types');
 const interactiveMessageAckBlock = require('./message-templates/interactiveMessageAckBlock');
@@ -41,6 +42,14 @@ const connectWithRandomPeople = async (user) => {
     const users = await getRandomUsersFromDifferentInterests(3, user);
     const { text, blocks } = require('./message-templates/suggestPeople')(users);
     await postAMessage(text, blocks, user);
+};
+
+const askForTimingPreference = async (user) => {
+    const { text, blocks } = require('./message-templates/whenToConnect');
+    const { ok, ts } = await postAMessage(text, blocks, user);
+    if (ok) {
+        nodeCache.set(ts, getPreferenceCacheObject(ts, user, TIMING_FREQUENCY_PREFERENCE));
+    }
 };
 
 const handleMessageEvent = async (eventType, user, action, ts, channel) => {
@@ -84,10 +93,16 @@ const handleMessageEvent = async (eventType, user, action, ts, channel) => {
                 const { text, blocks } = require('./message-templates/chooseInterests');
                 const message = `You chose *${interests.join(', ')}*`;
                 await ackMessage(ts, channel, blocks, text, message);
-                // Give a dummy frequency check question
-
             }
             await addUserInterestsToSheet(user, interests);
+            await askForTimingPreference(user);
+            break;
+        }
+        case TIMING_FREQUENCY_PREFERENCE: {
+            if (ts && channel) {
+                const { text, blocks } = require('./message-templates/whenToConnect');
+                await ackMessage(ts, channel, blocks, text);
+            }
             await checkConnectionPreference(user);
             break;
         }
@@ -185,8 +200,9 @@ const handleSlackEvent = async (eventType, payload) => {
                 const messageDetails = checkForMessageInCache(message_ts);// || { "userId": "U03LQPB0Q3W", "ts": "1656056324.025399", "type": "opt-in-out-preference", "recordedTimeStamp": 1656056327812 };
                 if (messageDetails) {
                     await handleMessageEvent(messageDetails.type, messageDetails.userId, actions[0], message_ts, channel_id);
+                } else {
+                    await handleUncachedBlocakActionEvent(payload);
                 }
-                await handleUncachedBlocakActionEvent(payload);
                 break;
             case SLACK_NATIVE.SHORTCUT: {
                 await getEquivalentCommand(payload);
