@@ -4,6 +4,9 @@ module.exports = {
 	text: 'Choose your topic of interests!',
 	blocks: [
 		{
+			"type": "divider"
+		},
+		{
 			type: 'section',
 			text: {
 				type: 'plain_text',

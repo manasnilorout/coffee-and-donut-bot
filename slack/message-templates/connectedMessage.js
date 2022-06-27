@@ -4,6 +4,9 @@ module.exports = {
     text: 'Connected you here!',
     blocks: [
         {
+			"type": "divider"
+		},
+        {
             type: 'section',
             fields: [
                 {

@@ -4,6 +4,9 @@ module.exports = {
     text: 'Consent to connect with colleagues!',
     blocks: [
         {
+			"type": "divider"
+		},
+        {
             type: 'section',
             fields: [
                 {
