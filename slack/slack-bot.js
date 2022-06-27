@@ -85,7 +85,7 @@ const handleMessageEvent = async (eventType, user, action, ts, channel) => {
                 const message = `You chose *${interests.join(', ')}*`;
                 await ackMessage(ts, channel, blocks, text, message);
                 // Give a dummy frequency check question
-                
+
             }
             await addUserInterestsToSheet(user, interests);
             await checkConnectionPreference(user);
@@ -150,15 +150,19 @@ const handleSlackCommand = async (command, payload) => {
 
 const createDMBetweenTwoPeople = (primaryUser, connectedUser) => web.conversations.open({ users: `${primaryUser},${connectedUser}` });
 
+const createDMBetweenTwoPeopleAndSayHi = async (primaryUser, connectedUser) => {
+    const { channel } = await createDMBetweenTwoPeople(primaryUser, connectedUser);
+    const { text, blocks } = require('./message-templates/connectedMessage');
+    await postAMessage(text, blocks, channel.id);
+};
+
 const handleUncachedBlocakActionEvent = async (payload) => {
     const { user, actions } = payload;
     const primaryAction = actions[0];
     const { action_id, value } = primaryAction;
     switch (action_id) {
         case 'connect_me': {
-            const { channel } = await createDMBetweenTwoPeople(user.id, value);
-            const { text, blocks } = require('./message-templates/connectedMessage');
-            await postAMessage(text, blocks, channel.id);
+            await createDMBetweenTwoPeopleAndSayHi(user.id, value);
             break;
         }
         default: {
@@ -215,4 +219,5 @@ module.exports = {
     chooseInterests,
     connectWithRandomPeople,
     createDMBetweenTwoPeople,
+    createDMBetweenTwoPeopleAndSayHi,
 };
