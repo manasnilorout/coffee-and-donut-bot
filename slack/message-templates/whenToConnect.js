@@ -13,7 +13,7 @@ module.exports = {
 				"text": "How often do you want to connect ?"
 			},
 			"accessory": {
-				"type": "multi_static_select",
+				"type": "static_select",
 				"placeholder": {
 					"type": "plain_text",
 					"text": "select one option",
