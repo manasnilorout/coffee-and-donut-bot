@@ -156,6 +156,10 @@ const handleSlackCommand = async (command, payload) => {
             await postAMessage(text, blocks, channel_id);
             break;
         }
+        case SLACK_COMMANDS.RATE_ME: {
+            // TODO
+            break;
+        }
         default: {
             console.log('Unhandled command received', payload);
             break;

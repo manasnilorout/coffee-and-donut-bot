@@ -12,7 +12,7 @@ module.exports = ({ name, link }) => ({
             type: 'section',
             text: {
                 type: 'mrkdwn',
-                text: 'Hmm, Time for a game! Click on the button :arrow_right: '
+                text: 'Time to play a Fun Game! Click on the button to the right :arrow_right: '
             },
             accessory: {
                 type: 'button',
