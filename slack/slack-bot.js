@@ -166,7 +166,7 @@ const handleSlackCommand = async (command, payload) => {
             break;
         }
         case SLACK_COMMANDS.WAVE: {
-            console.log('Nothing is here!');
+            console.log('Nothing is here!!');
             break;
         }
         default: {
