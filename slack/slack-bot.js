@@ -8,7 +8,8 @@ const {
     addUserInterestsToSheet,
     getARandomQuestion,
     getARandomGame,
-} = require('../integration-service/goggle-sheet-interpreter');
+    getRandomUsersFromDifferentInterests,
+} = require('../integration-service/google-sheet-interpreter');
 const {
     OPT_IN_OUT_PREFERENCE,
     SLACK_NATIVE,
@@ -35,6 +36,12 @@ const ackMessage = async (ts, channel, blocks, text, overrideText) => {
     newBlocks.push(interactiveMessageAckBlock(overrideText));
     await updateAMessage(ts, text, newBlocks, channel);
 }
+
+const connectWithRandomPeople = async (user) => {
+    const users = await getRandomUsersFromDifferentInterests(3, user);
+    const { text, blocks } = require('./message-templates/suggestPeople')(users);
+    await postAMessage(text, blocks, user);
+};
 
 const handleMessageEvent = async (eventType, user, action, ts, channel) => {
     const { value, selected_options } = action;
@@ -64,6 +71,7 @@ const handleMessageEvent = async (eventType, user, action, ts, channel) => {
             }
             const { text, blocks } = require('./message-templates/surpriseMe');
             await postAMessage(text, blocks, user);
+            await connectWithRandomPeople(user);
             break;
         }
         case INTERESTS_PREFERENCE: {
@@ -86,7 +94,6 @@ const handleMessageEvent = async (eventType, user, action, ts, channel) => {
             break;
         }
     }
-
 };
 
 const checkConnectionPreference = async (userId) => {
@@ -139,6 +146,26 @@ const handleSlackCommand = async (command, payload) => {
     }
 };
 
+const createDMBetweenTwoPeople = (primaryUser, connectedUser) => web.conversations.open({ users: `${primaryUser},${connectedUser}` });
+
+const handleUncachedBlocakActionEvent = async (payload) => {
+    const { user, actions } = payload;
+    const primaryAction = actions[0];
+    const { action_id, value } = primaryAction;
+    switch (action_id) {
+        case 'connect_me': {
+            const { channel } = await createDMBetweenTwoPeople(user.id, value);
+            const { text, blocks } = require('./message-templates/connectedMessage');
+            await postAMessage(text, blocks, channel.id);
+            break;
+        }
+        default: {
+            console.log('Unhandled block action.', payload);
+            break;
+        }
+    }
+};
+
 const getEquivalentCommand = async (payload) => {
     console.log('Doing nothing with the shortcut', payload)
 };
@@ -149,10 +176,11 @@ const handleSlackEvent = async (eventType, payload) => {
         switch (eventType) {
             case SLACK_NATIVE.BLOCK_ACTIONS:
                 const { message_ts, channel_id } = container;
-                const messageDetails = checkForMessageInCache(message_ts)// || { "userId": "U03LQPB0Q3W", "ts": "1656056324.025399", "type": "opt-in-out-preference", "recordedTimeStamp": 1656056327812 };
+                const messageDetails = checkForMessageInCache(message_ts);// || { "userId": "U03LQPB0Q3W", "ts": "1656056324.025399", "type": "opt-in-out-preference", "recordedTimeStamp": 1656056327812 };
                 if (messageDetails) {
                     await handleMessageEvent(messageDetails.type, messageDetails.userId, actions[0], message_ts, channel_id);
                 }
+                await handleUncachedBlocakActionEvent(payload);
                 break;
             case SLACK_NATIVE.SHORTCUT: {
                 await getEquivalentCommand(payload);
@@ -183,4 +211,6 @@ module.exports = {
     askForOptingInPreference,
     checkConnectionPreference,
     chooseInterests,
+    connectWithRandomPeople,
+    createDMBetweenTwoPeople,
 };

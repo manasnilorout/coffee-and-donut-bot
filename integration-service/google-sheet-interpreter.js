@@ -29,7 +29,7 @@ const constructObjectFromSheetsResponse = ({ values }) => {
         });
     }
     return tempObj;
-}
+};
 
 const getUserPreferenceApiEndPoint = () => `${baseUrl}/${spreadSheetId}/worksheets/${sheetConstants.preferences}/rows/${sheetConstants.userPreferencesCell}`;
 const getSheetMultiplesApiEndpoint = (sheetName) => `${baseUrl}/${spreadSheetId}/worksheets/${sheetName}/multiples`;
@@ -57,11 +57,43 @@ const getSheetDetails = async (sheetName) => {
 
 const getARandomGame = async () => {
     const games = await getSheetDetails(sheetConstants.games);
-    const randomIndex = getRandomInt(games.names.length + 1);
+    const randomIndex = getRandomInt(games.names.length);
     return {
         name: games.names[randomIndex],
         link: games.links[randomIndex],
     }
+};
+
+const getUserName = (users, userId) => users.real_name[users.id.indexOf(userId)];
+
+const getRandomUsersFromDifferentInterests = async (countOfUsers = 3, exludeUser) => {
+    const usersWithInterest = await getUserInterests();
+    const users = await getSheetDetails(sheetConstants.users);
+
+    const randomInterests = [];
+    const randomUsers = [];
+
+    for (let i = 0; i < countOfUsers; i++) {
+        randomInterests.push(Object.keys(usersWithInterest)[getRandomInt(Object.keys(usersWithInterest).length)]);
+    }
+
+    const selectedUsers = new Set();
+
+    if (exludeUser) selectedUsers.add(exludeUser);
+    
+    randomInterests.forEach(interest => {
+        const tempUserSlackId = usersWithInterest[interest][getRandomInt(usersWithInterest[interest].length)];
+        if (selectedUsers.has(tempUserSlackId)) return;
+        selectedUsers.add(tempUserSlackId);
+        randomUsers.push({
+            interest,
+            interestEmoji: `:${interest}_cd:`,
+            user: tempUserSlackId,
+            userName: getUserName(users, tempUserSlackId),
+        });
+    });
+
+    return randomUsers;
 };
 
 const getARandomQuestion = async (category) => {
@@ -70,11 +102,11 @@ const getARandomQuestion = async (category) => {
     if (category && questions[category]) {
         context = category;
     } else {
-        context = Object.keys(questions)[getRandomInt(Object.keys(questions).length + 1)];
+        context = Object.keys(questions)[getRandomInt(Object.keys(questions).length)];
     }
     return {
         context,
-        question: questions[context][getRandomInt(questions[context].length + 1)],
+        question: questions[context][getRandomInt(questions[context].length)],
     };
 };
 
@@ -115,4 +147,5 @@ module.exports = {
     constructObjectFromSheetsResponse,
     getARandomQuestion,
     getARandomGame,
+    getRandomUsersFromDifferentInterests,
 };
