@@ -90,7 +90,15 @@ module.exports = {
 							emoji: true
 						},
 						value: 'games'
-					}
+					},
+					{
+						text: {
+							type: 'plain_text',
+							text: 'UiPath :ui_cd:',
+							emoji: true
+						},
+						value: 'ui'
+					},
 				],
 				action_id: 'multi_static_select-action'
 			},
