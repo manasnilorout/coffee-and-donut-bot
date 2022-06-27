@@ -84,6 +84,8 @@ const handleMessageEvent = async (eventType, user, action, ts, channel) => {
                 const { text, blocks } = require('./message-templates/chooseInterests');
                 const message = `You chose *${interests.join(', ')}*`;
                 await ackMessage(ts, channel, blocks, text, message);
+                // Give a dummy frequency check question
+                
             }
             await addUserInterestsToSheet(user, interests);
             await checkConnectionPreference(user);

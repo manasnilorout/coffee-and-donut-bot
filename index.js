@@ -9,7 +9,7 @@ const port = process.env.PORT || 5001;
 app.use(urlencoded({ extended: true }));
 app.use(json());
 
-const { handleSlackEvent, askForOptingInPreference } = require('./slack/slack-bot');
+const { handleSlackEvent, askForOptingInPreference, createDMBetweenTwoPeople } = require('./slack/slack-bot');
 
 app.get('/', function (req, res) {
     res.json({
@@ -27,6 +27,10 @@ app.post('/slack-events', async (req, res) => {
         handleSlackEvent('command', req.body);
     }
     res.json({ success: true });
+});
+
+app.post('/start-a-dm/:user1/:user2', async (req, res) => {
+    return res.json(await createDMBetweenTwoPeople(req.params.user1, req.params.user2).catch(e => e));
 });
 
 app.post('/ask-preference/:userId', async (req, res) => {
