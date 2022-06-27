@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    text: 'Thanks for the response! You\'ll not be connected with anyone.',
+    text: 'Thanks for the response! You will not be connected with anyone.',
     blocks: [
         {
             type: 'header',
