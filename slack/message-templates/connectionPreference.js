@@ -23,8 +23,9 @@ module.exports = {
                     text: {
                         type: 'plain_text',
                         emoji: true,
-                        text: 'Like Me :likeme_cd:'
+                        text: 'Like Me :woman-with-bunny-ears-partying:'
                     },
+                    style: 'primary',
                     value: 'like_me'
                 },
                 {
@@ -32,8 +33,9 @@ module.exports = {
                     text: {
                         type: 'plain_text',
                         emoji: true,
-                        text: 'Surprise Me :surpriseme_cd:'
+                        text: 'Surprise Me :sparkles:'
                     },
+                    style: 'danger',
                     value: 'random'
                 }
             ]

@@ -14,5 +14,8 @@ module.exports = {
         COFFEE: '/coffee',
         ASK_A_QUESTIONS: '/ask_a_question',
         SUGGEST_GAME: '/suggest_game',
+        RATE_ME: '/rate_me',
+        WAVE: '/wave',
+        RESET_PREFERENCE: '/reset_preference',
     },
 };

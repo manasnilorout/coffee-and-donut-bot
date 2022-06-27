@@ -144,6 +144,10 @@ const handleSlackCommand = async (command, payload) => {
             await askForOptingInPreference(user_id);
             break;
         }
+        case SLACK_COMMANDS.RESET_PREFERENCE: {
+            await askForOptingInPreference(user_id);
+            break;
+        }
         case SLACK_COMMANDS.ASK_A_QUESTIONS: {
             const question = await getARandomQuestion(payload.text);
             const { text, blocks } = buildQuestion(question);
@@ -157,7 +161,12 @@ const handleSlackCommand = async (command, payload) => {
             break;
         }
         case SLACK_COMMANDS.RATE_ME: {
-            // TODO
+            const { text, blocks } = require('./message-templates/rateMe');
+            await postAMessage(text, blocks, channel_id);
+            break;
+        }
+        case SLACK_COMMANDS.WAVE: {
+            console.log('Nothing is here!');
             break;
         }
         default: {
