@@ -7,7 +7,7 @@ module.exports = {
 			type: 'section',
 			text: {
 				type: 'plain_text',
-				text: 'What are you passionate about? Choose at least 3 topics of interest from the drop-down.',
+				text: 'What are you passionate about? Choose at least 5 topics of interest from the drop-down.',
 				emoji: true
 			}
 		},
