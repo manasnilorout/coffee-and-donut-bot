@@ -6,6 +6,9 @@ module.exports = ({ name, link }) => ({
     text: 'Here\'s a game suggestion',
     blocks: [
         {
+			"type": "divider"
+		},
+        {
             type: 'section',
             text: {
                 type: 'mrkdwn',
